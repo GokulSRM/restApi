@@ -7,5 +7,7 @@ import com.example.crud.restApi.module.Student;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long> {
+
+    Student findByEmail(String email);
     
 }

@@ -22,17 +22,17 @@ import com.example.crud.restApi.module.Student;
 import com.example.crud.restApi.repository.StudentRepository;
 
 @RestController
-@RequestMapping()
+@RequestMapping("${base.url}")
 public class StudentController {
     @Autowired
     private StudentRepository studentRepository;
 
-    @GetMapping("/students")
+    @GetMapping("${getall.url}")
     public List<Student> getAllStudent() {
         return studentRepository.findAll();
     }
 
-    @GetMapping("/student/{id}")
+    @GetMapping("${get.url}")
     public ResponseEntity<Student> getStudentById(@PathVariable(value = "id") Long studentId)
             throws ResourceNotFoundException {
         Student student1 = studentRepository.findById(studentId)
@@ -40,12 +40,27 @@ public class StudentController {
         return ResponseEntity.ok().body(student1);
     }
 
-    @PostMapping("/student")
-    public Student createStudent(@Valid @RequestBody Student student2) {
-        return studentRepository.save(student2);
+    @PostMapping("${post.url}")
+    public ResponseEntity<String> createStudent(@Valid @RequestBody Student student2) throws ResourceNotFoundException {
+
+        Student exitStudent = studentRepository.findByEmail(student2.getEmail());
+
+        if (exitStudent != null && exitStudent.getEmail() != null && !exitStudent.getEmail().isEmpty()) {
+
+            // Map<String, Boolean> response = new HashMap<>();
+            // response.put("There is already an account registered with the same email", Boolean.TRUE);
+            //         return (Student) response;
+            return ResponseEntity.ok("Email already exists");
+        }
+        else{
+            studentRepository.save(student2);
+            return ResponseEntity.ok("Student created");
+            // return (Student) ResponseEntity.status(400);
+        }
+
     }
 
-    @PutMapping("/student/{id}")
+    @PutMapping("${put.url}")
     public ResponseEntity<Student> updateStudent(@PathVariable(value = "id") Long studentId,
             @Valid @RequestBody Student studentdetails) throws ResourceNotFoundException {
         Student student3 = studentRepository.findById(studentId)
@@ -55,12 +70,13 @@ public class StudentController {
         student3.setLastName(studentdetails.getLastName());
         student3.setAge(studentdetails.getAge());
         student3.setEmail(studentdetails.getEmail());
+        student3.setDept(studentdetails.getDept());
 
         final Student updateStudent = studentRepository.save(student3);
         return ResponseEntity.ok(updateStudent);
     }
 
-    @DeleteMapping("/student/{id}")
+    @DeleteMapping("${delete.url}")
     public Map<String, Boolean> deleteStudent(@PathVariable(value = "id") Long studentId)
             throws ResourceNotFoundException {
         Student student4 = studentRepository.findById(studentId)
