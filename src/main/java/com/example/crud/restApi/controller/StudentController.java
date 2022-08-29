@@ -44,7 +44,7 @@ public class StudentController {
     public ResponseEntity<String> createStudent(@Valid @RequestBody Student student2) throws ResourceNotFoundException {
 
         Student exitStudent = studentRepository.findByEmail(student2.getEmail());
-
+        
         if (exitStudent != null && exitStudent.getEmail() != null && !exitStudent.getEmail().isEmpty()) {
 
             // Map<String, Boolean> response = new HashMap<>();
